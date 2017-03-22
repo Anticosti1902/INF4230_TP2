@@ -93,7 +93,7 @@ public class JoueurArtificiel implements Joueur {
          return casesPleines;
     }
  
-    public int evalLigne(ArrayList<Integer> caseJouees, ArrayList<Integer> casesVides, int joueur, int nbcol, int totalSize) {
+    /*public int evalLigne(ArrayList<Integer> caseJouees, ArrayList<Integer> casesVides, int joueur, int nbcol, int totalSize) {
         int nbSuite = 0;
         int eval = 1;
         int lastPlay = 0;
@@ -119,25 +119,104 @@ public class JoueurArtificiel implements Joueur {
             lastPlay = caseJouees.get(i);
         }
         return eval;
-    }
-
-    public int evalColonne(ArrayList<Integer> caseJouees, int joueur, int nbcol) {
+    }*/
+    public int evalLigne(ArrayList<Integer> caseJouees, int joueur, int nbcol) {
         int nbSuite = 1;
         int eval = 0;
         int i = 0;
-        while (!caseJouees.isEmpty()) {
-            if (caseJouees.contains(caseJouees.get(i) + nbcol)) {
+        ArrayList<Integer> caseJoueesTemp = new ArrayList<>();
+        caseJoueesTemp.addAll(caseJouees);
+        while (!caseJoueesTemp.isEmpty()) {
+            if (caseJoueesTemp.contains(caseJoueesTemp.get(i) + 1)) {
                 nbSuite++;
                 int tmp =  i;
-                i = caseJouees.indexOf(caseJouees.get(i) + nbcol) - 1;
-                caseJouees.remove(tmp);
+                i = caseJoueesTemp.indexOf(caseJoueesTemp.get(i) + 1) - 1;
+                caseJoueesTemp.remove(tmp);
             } else {
                 if (nbSuite == 6) {
                     eval += 0;
                 } else if (nbSuite !=1){
                     eval += pow(10, nbSuite - 1);
                 }
-                caseJouees.remove(i);
+                caseJoueesTemp.remove(i);
+                nbSuite = 1;
+                i = 0;
+            }
+        }
+        return eval;
+    }
+
+    public int evalColonne(ArrayList<Integer> caseJouees, int joueur, int nbcol) {
+        int nbSuite = 1;
+        int eval = 0;
+        int i = 0;
+        ArrayList<Integer> caseJoueesTemp = new ArrayList<>();
+        caseJoueesTemp.addAll(caseJouees);
+        while (!caseJoueesTemp.isEmpty()) {
+            if (caseJoueesTemp.contains(caseJoueesTemp.get(i) + nbcol)) {
+                nbSuite++;
+                int tmp =  i;
+                i = caseJoueesTemp.indexOf(caseJoueesTemp.get(i) + nbcol) - 1;
+                caseJoueesTemp.remove(tmp);
+            } else {
+                if (nbSuite == 6) {
+                    eval += 0;
+                } else if (nbSuite !=1){
+                    eval += pow(10, nbSuite - 1);
+                }
+                caseJoueesTemp.remove(i);
+                nbSuite = 1;
+                i = 0;
+            }
+        }
+        return eval;
+    }
+    
+    public int evalDiagDroite(ArrayList<Integer> caseJouees, int joueur, int nbcol) {
+        int nbSuite = 1;
+        int eval = 0;
+        int i = 0;
+        ArrayList<Integer> caseJoueesTemp = new ArrayList<>();
+        caseJoueesTemp.addAll(caseJouees);
+        while (!caseJoueesTemp.isEmpty()) {
+            if (caseJoueesTemp.contains(caseJoueesTemp.get(i) + nbcol + 1)) {
+                nbSuite++;
+                int tmp =  i;
+                i = caseJoueesTemp.indexOf(caseJoueesTemp.get(i) + nbcol + 1) - 1;
+                caseJoueesTemp.remove(tmp);
+            } else {
+                if (nbSuite == 6) {
+                    eval += 0;
+                } else if (nbSuite !=1){
+                    eval += pow(10, nbSuite - 1);
+                }
+                caseJoueesTemp.remove(i);
+                nbSuite = 1;
+                i = 0;
+            }
+        }
+        return eval;
+    }
+    
+    public int evalDiagGauche(ArrayList<Integer> caseJouees, int joueur, int nbcol) {
+        int nbSuite = 1;
+        int eval = 0;
+        int i = 0;
+        ArrayList<Integer> caseJoueesTemp = new ArrayList<>();
+        caseJoueesTemp.addAll(caseJouees);
+        while (!caseJoueesTemp.isEmpty()) {
+            if (caseJoueesTemp.contains(caseJoueesTemp.get(i) + nbcol - 1)) {
+                nbSuite++;
+                int tmp =  i;
+                i = caseJoueesTemp.indexOf(caseJoueesTemp.get(i) + nbcol - 1) - 1;
+                caseJoueesTemp.remove(tmp);
+            } else {
+                if (nbSuite == 6) {
+                    eval += 0;
+                } else if (nbSuite !=1){
+                    eval += pow(10, nbSuite - 1);
+                }
+                caseJoueesTemp.remove(i);
                 nbSuite = 1;
                 i = 0;
             }
@@ -147,9 +226,12 @@ public class JoueurArtificiel implements Joueur {
 
     public int globalEval(ArrayList<Integer> caseJouees,ArrayList<Integer> casesvides, int joueur, int nbCol, int totalSize)
     {
-        int eval = evalLigne(caseJouees, casesvides, joueur, nbCol, totalSize);
-        //int eval = evalColonne(caseJouees, joueur, nbCol);
-        return eval;
+        int eval1 = evalLigne(caseJouees, joueur, nbCol);
+        int eval2 = evalColonne(caseJouees, joueur, nbCol);
+        int eval3 = evalDiagDroite(caseJouees, joueur, nbCol);
+        int eval4 = evalDiagGauche(caseJouees, joueur, nbCol);
+        int globalEval = eval1+eval2+eval3+eval4;
+        return globalEval;
     }
     
     public boolean is5PossibleLigne(ArrayList<Integer> casesVides, int nbSuite, int pos, int nbCol)
