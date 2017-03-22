@@ -40,6 +40,7 @@ public class JoueurArtificiel implements Joueur {
         ArrayList<Integer> casesvides = new ArrayList<>();
         ArrayList<Integer> casesJoueesJ1 = new ArrayList<>();
         ArrayList<Integer> casesJoueesJ2 = new ArrayList<>();
+        ArrayList<Integer> coupsSeuls = new ArrayList<>();
         
         int nbcol = grille.getData()[0].length;
         for (int l = 0; l < grille.getData().length; l++) {
@@ -53,8 +54,8 @@ public class JoueurArtificiel implements Joueur {
         if (joueur == 1) {
             casesJoueesJ1 = getCasesJouées(grille, joueur);
             casesJoueesJ2 = getCasesJouées(grille, joueur + 1);
-            evalJ1 = globalEval(casesJoueesJ1, casesvides, joueur, nbcol, grille.getSize());
-            evalJ2 = globalEval(casesJoueesJ2, casesvides, joueur + 1, nbcol, grille.getSize());
+            evalJ1 = globalEval(casesJoueesJ1, casesvides, joueur, nbcol, grille.getSize(), coupsSeuls);
+            evalJ2 = globalEval(casesJoueesJ2, casesvides, joueur + 1, nbcol, grille.getSize(), coupsSeuls);
         }
         System.out.println(evalJ1);
         int choix = random.nextInt(casesvides.size());
@@ -120,7 +121,7 @@ public class JoueurArtificiel implements Joueur {
         }
         return eval;
     }*/
-    public int evalLigne(ArrayList<Integer> caseJouees, int joueur, int nbcol) {
+    public int evalLigne(ArrayList<Integer> caseJouees, int joueur, int nbcol, ArrayList<Integer> coupsSeuls) {
         int nbSuite = 1;
         int eval = 0;
         int i = 0;
@@ -138,6 +139,9 @@ public class JoueurArtificiel implements Joueur {
                 } else if (nbSuite !=1){
                     eval += pow(10, nbSuite - 1);
                 }
+                else if (!coupsSeuls.contains(caseJoueesTemp.get(i))){   
+                    coupsSeuls.add(caseJoueesTemp.get(i));
+                }
                 caseJoueesTemp.remove(i);
                 nbSuite = 1;
                 i = 0;
@@ -146,7 +150,7 @@ public class JoueurArtificiel implements Joueur {
         return eval;
     }
 
-    public int evalColonne(ArrayList<Integer> caseJouees, int joueur, int nbcol) {
+    public int evalColonne(ArrayList<Integer> caseJouees, int joueur, int nbcol, ArrayList<Integer> coupsSeuls) {
         int nbSuite = 1;
         int eval = 0;
         int i = 0;
@@ -164,6 +168,9 @@ public class JoueurArtificiel implements Joueur {
                 } else if (nbSuite !=1){
                     eval += pow(10, nbSuite - 1);
                 }
+                else if (!coupsSeuls.contains(caseJoueesTemp.get(i))){   
+                    coupsSeuls.add(caseJoueesTemp.get(i));
+                }
                 caseJoueesTemp.remove(i);
                 nbSuite = 1;
                 i = 0;
@@ -172,7 +179,7 @@ public class JoueurArtificiel implements Joueur {
         return eval;
     }
     
-    public int evalDiagDroite(ArrayList<Integer> caseJouees, int joueur, int nbcol) {
+    public int evalDiagDroite(ArrayList<Integer> caseJouees, int joueur, int nbcol, ArrayList<Integer> coupsSeuls) {
         int nbSuite = 1;
         int eval = 0;
         int i = 0;
@@ -190,6 +197,9 @@ public class JoueurArtificiel implements Joueur {
                 } else if (nbSuite !=1){
                     eval += pow(10, nbSuite - 1);
                 }
+                else if (!coupsSeuls.contains(caseJoueesTemp.get(i))){   
+                    coupsSeuls.add(caseJoueesTemp.get(i));
+                }
                 caseJoueesTemp.remove(i);
                 nbSuite = 1;
                 i = 0;
@@ -198,7 +208,7 @@ public class JoueurArtificiel implements Joueur {
         return eval;
     }
     
-    public int evalDiagGauche(ArrayList<Integer> caseJouees, int joueur, int nbcol) {
+    public int evalDiagGauche(ArrayList<Integer> caseJouees, int joueur, int nbcol, ArrayList<Integer> coupsSeuls) {
         int nbSuite = 1;
         int eval = 0;
         int i = 0;
@@ -216,6 +226,9 @@ public class JoueurArtificiel implements Joueur {
                 } else if (nbSuite !=1){
                     eval += pow(10, nbSuite - 1);
                 }
+                else if (!coupsSeuls.contains(caseJoueesTemp.get(i))){   
+                    coupsSeuls.add(caseJoueesTemp.get(i));
+                }
                 caseJoueesTemp.remove(i);
                 nbSuite = 1;
                 i = 0;
@@ -223,14 +236,30 @@ public class JoueurArtificiel implements Joueur {
         }
         return eval;
     }
-
-    public int globalEval(ArrayList<Integer> caseJouees,ArrayList<Integer> casesvides, int joueur, int nbCol, int totalSize)
+    
+    public int evalUnique(ArrayList<Integer> caseUniques, int valeur, int ajouter)
     {
-        int eval1 = evalLigne(caseJouees, joueur, nbCol);
-        int eval2 = evalColonne(caseJouees, joueur, nbCol);
-        int eval3 = evalDiagDroite(caseJouees, joueur, nbCol);
-        int eval4 = evalDiagGauche(caseJouees, joueur, nbCol);
-        int globalEval = eval1+eval2+eval3+eval4;
+        if(ajouter == 1)
+        {
+            if(!caseUniques.contains(valeur))
+                caseUniques.add(valeur);
+        }
+        else if (ajouter == 0)
+        {
+            if(caseUniques.contains(valeur))
+                caseUniques.remove(valeur);
+        }
+            
+        return caseUniques.size();
+    }
+
+    public int globalEval(ArrayList<Integer> caseJouees,ArrayList<Integer> casesvides, int joueur, int nbCol, int totalSize,  ArrayList<Integer> coupsSeuls)
+    {
+        int eval1 = evalLigne(caseJouees, joueur, nbCol, coupsSeuls);
+        int eval2 = evalColonne(caseJouees, joueur, nbCol, coupsSeuls);
+        int eval3 = evalDiagDroite(caseJouees, joueur, nbCol, coupsSeuls);
+        int eval4 = evalDiagGauche(caseJouees, joueur, nbCol, coupsSeuls);
+        int globalEval = eval1+eval2+eval3+eval4+coupsSeuls.size();
         return globalEval;
     }
     
